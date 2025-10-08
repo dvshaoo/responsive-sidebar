@@ -1,0 +1,627 @@
+<!-- detuy tay reusable nga sidebar ety ti pinaka file na mabalin mo isuna i call other pages  -->
+<style>
+:root {
+    --sidebar-width: 16rem;
+    --sidebar-width-mobile: 18rem;
+    --sidebar-width-icon: 3rem;
+}
+
+
+.sidebar-wrapper {
+    display: flex;
+    min-height: 100vh;
+    width: 100%;
+}
+
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    width: var(--sidebar-width);
+    background-color: hsl(0 0% 98%);
+    border-right: 1px solid hsl(220 13% 91%);
+    transition: width 0.3s ease;
+    z-index: 40;
+    display: flex;
+    flex-direction: column;
+}
+
+.sidebar[data-state="collapsed"] {
+    width: var(--sidebar-width-icon);
+}
+
+.sidebar-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem;
+    border-bottom: 1px solid hsl(220 13% 91%);
+    min-height: 4rem;
+    position: relative;
+}
+
+.sidebar[data-state="collapsed"] .sidebar-header {
+    justify-content: center;
+    padding: 1rem 0.5rem;
+}
+
+.logo-container {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.sidebar[data-state="collapsed"] .logo-container {
+    justify-content: center;
+}
+
+.logo-image {
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    background-color: #601008;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    overflow: hidden;
+    font-weight: bold;
+    color: white;
+    font-size: 1rem;
+}
+
+.sidebar[data-state="collapsed"] .logo-image {
+    width: 1.75rem;
+    height: 1.75rem;
+    font-size: 0.875rem;
+}
+
+.logo-text {
+    font-family: 'Anta', sans-serif;
+    font-weight: bold;
+    font-size: 1.25rem;
+    color: #601008;
+    white-space: nowrap;
+}
+
+.sidebar[data-state="collapsed"] .logo-text {
+    display: none;
+}
+
+.sidebar-trigger {
+    padding: 0.25rem;
+    border-radius: 0.25rem;
+    transition: background-color 0.15s ease;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    background: transparent;
+}
+
+.sidebar-trigger:hover {
+    background-color: rgba(0, 0, 0, 0.1);
+}
+
+.sidebar[data-state="collapsed"] .sidebar-trigger {
+    position: absolute;
+    top: 50%;
+    right: -0.75rem;
+    transform: translateY(-50%);
+    background-color: white;
+    border: 1px solid hsl(220 13% 91%);
+    border-radius: 50%;
+    width: 1.5rem;
+    height: 1.5rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    z-index: 10;
+}
+
+.sidebar-content {
+    flex: 1;
+    padding: 0.75rem;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.sidebar[data-state="collapsed"] .sidebar-content {
+    overflow: visible;
+}
+
+.sidebar-menu-item {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    padding: 0.5rem 0.75rem;
+    border-radius: 0.375rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: hsl(240 5.3% 26.1%);
+    transition: all 0.15s ease;
+    text-decoration: none;
+    margin-bottom: 0.125rem;
+    position: relative;
+    gap: 0.75rem;
+}
+
+.sidebar-menu-item:hover {
+    background-color: hsl(240 4.8% 95.9%);
+    color: hsl(240 5.9% 10%);
+}
+
+.sidebar-menu-item.active {
+    background-color: hsl(240 4.8% 95.9%);
+    color: hsl(240 5.9% 10%);
+    font-weight: 600;
+}
+
+.sidebar-menu-item i {
+    width: 1rem;
+    height: 1rem;
+    flex-shrink: 0;
+}
+
+.sidebar[data-state="collapsed"] .sidebar-menu-item {
+    justify-content: center;
+    padding: 0.5rem;
+    gap: 0;
+}
+
+.sidebar[data-state="collapsed"] .sidebar-text {
+    display: none;
+}
+
+.sidebar-footer {
+    padding: 0.75rem;
+    border-top: 1px solid hsl(220 13% 91%);
+}
+
+.sidebar-footer .profile-dropdown {
+    position: relative;
+}
+
+.sidebar-footer .dropdown-content {
+    position: absolute;
+    bottom: 100%;
+    left: 0;
+    margin-bottom: 0.5rem;
+    width: 12rem;
+    background-color: white;
+    border-radius: 0.5rem;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    border: 1px solid hsl(220 13% 91%);
+    overflow: hidden;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+    z-index: 50;
+}
+
+.sidebar[data-state="collapsed"] .sidebar-footer .dropdown-content {
+    left: 100%;
+    bottom: 0;
+    margin-left: 0.5rem;
+    margin-bottom: 0;
+}
+
+.sidebar-footer .profile-dropdown:hover .dropdown-content {
+    opacity: 1;
+    visibility: visible;
+}
+
+.main-content {
+    flex: 1;
+    margin-left: var(--sidebar-width);
+    transition: margin-left 0.3s ease;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    z-index: 1;
+}
+
+.sidebar[data-state="collapsed"] ~ .main-content {
+    margin-left: var(--sidebar-width-icon);
+}
+
+/* Mobile Bottom Navigation */
+.mobile-bottom-nav {
+    display: none;
+}
+
+/* Enhanced Tooltip Styles - With Icon + Text */
+.tooltip {
+    position: fixed;
+    margin-left: 0.75rem;
+    background-color: #ffffff;
+    color: #1f2937;
+    padding: 0.5rem 0.75rem;
+    border-radius: 0.5rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.2s ease;
+    z-index: 9999;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2), 0 4px 6px -2px rgba(0, 0, 0, 0.1);
+    border: 1px solid hsl(220 13% 91%);
+    pointer-events: none;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* Tooltip Arrow - White */
+.tooltip::before {
+    content: '';
+    position: absolute;
+    right: 100%;
+    top: 50%;
+    transform: translateY(-50%);
+    border: 6px solid transparent;
+    border-right-color: #ffffff;
+    filter: drop-shadow(-1px 0px 0px hsl(220 13% 91%));
+}
+
+.tooltip i {
+    width: 1rem;
+    height: 1rem;
+    flex-shrink: 0;
+}
+
+.sidebar[data-state="collapsed"] .sidebar-menu-item:hover .tooltip {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Mobile Styles - Bottom Navigation */
+@media (max-width: 768px) {
+    .sidebar {
+        display: none;
+    }
+    
+    .main-content {
+        margin-left: 0 !important;
+        padding-bottom: 5rem;
+    }
+
+    /* Mobile Bottom Navigation Bar */
+    .mobile-bottom-nav {
+        display: flex;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background-color: hsl(0 0% 98%);
+        border-top: 1px solid hsl(220 13% 91%);
+        padding: 0.5rem 0;
+        z-index: 50;
+        box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .mobile-nav-container {
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+        width: 100%;
+        max-width: 100%;
+        overflow-x: auto;
+    }
+
+    .mobile-nav-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 0.25rem;
+        padding: 0.5rem 0.75rem;
+        min-width: 60px;
+        text-decoration: none;
+        color: hsl(240 5.3% 26.1%);
+        transition: all 0.15s ease;
+        border-radius: 0.5rem;
+    }
+
+    .mobile-nav-item i {
+        width: 1.25rem;
+        height: 1.25rem;
+    }
+
+    .mobile-nav-item span {
+        font-size: 0.65rem;
+        font-weight: 500;
+        white-space: nowrap;
+    }
+
+    .mobile-nav-item:hover,
+    .mobile-nav-item.active {
+        color: #601008;
+        background-color: hsl(240 4.8% 95.9%);
+    }
+
+    .mobile-nav-item.active {
+        font-weight: 600;
+    }
+
+    /* Mobile Header */
+    .mobile-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 1rem;
+        background-color: hsl(0 0% 98%);
+        border-bottom: 1px solid hsl(220 13% 91%);
+        position: sticky;
+        top: 0;
+        z-index: 30;
+    }
+
+    .mobile-header .logo-container {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .mobile-header .logo-image {
+        width: 2rem;
+        height: 2rem;
+        border-radius: 50%;
+        background-color: #601008;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        color: white;
+        font-size: 1rem;
+    }
+
+    .mobile-header .logo-text {
+        font-family: 'Anta', sans-serif;
+        font-weight: bold;
+        font-size: 1.25rem;
+        color: #601008;
+    }
+
+    .mobile-profile-btn {
+        width: 2.5rem;
+        height: 2.5rem;
+        border-radius: 50%;
+        background-color: hsl(240 4.8% 95.9%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: none;
+        cursor: pointer;
+        transition: background-color 0.15s ease;
+    }
+
+    .mobile-profile-btn:hover {
+        background-color: hsl(220 13% 91%);
+    }
+}
+</style>
+
+<!-- Desktop Sidebar -->
+<aside id="sidebar" class="sidebar" data-state="expanded">
+    <!-- Sidebar Header -->
+    <div class="sidebar-header">
+        <div class="logo-container">
+            <div class="logo-image">
+                EC
+            </div>
+            <div class="sidebar-text flex flex-col">
+                <span class="logo-text">E-Commerce</span>
+                <span class="text-xs text-gray-500 -mt-1">Admin Panel</span>
+            </div>
+        </div>
+        <button id="sidebar-collapse-btn" class="sidebar-trigger hidden md:flex">
+            <i data-lucide="panel-left" class="h-4 w-4"></i>
+        </button>
+    </div>
+
+    <!-- Sidebar Content -->
+    <nav class="sidebar-content">
+        <a href="#" class="sidebar-menu-item active" data-page="dashboard" title="Dashboard">
+            <i data-lucide="layout-dashboard"></i>
+            <span class="sidebar-text">Dashboard</span>
+            <span class="tooltip">
+                <i data-lucide="layout-dashboard"></i>
+                <span>Dashboard</span>
+            </span>
+        </a>
+        
+        <a href="products.php" class="sidebar-menu-item" data-page="products" title="Products">
+            <i data-lucide="package"></i>
+            <span class="sidebar-text">Products</span>
+            <span class="tooltip">
+                <i data-lucide="package"></i>
+                <span>Products</span>
+            </span>
+        </a>
+        
+        <a href="#" class="sidebar-menu-item" data-page="orders" title="Orders">
+            <i data-lucide="shopping-cart"></i>
+            <span class="sidebar-text">Orders</span>
+            <span class="tooltip">
+                <i data-lucide="shopping-cart"></i>
+                <span>Orders</span>
+            </span>
+        </a>
+        
+        <a href="#" class="sidebar-menu-item" data-page="customers" title="Customers">
+            <i data-lucide="users"></i>
+            <span class="sidebar-text">Customers</span>
+            <span class="tooltip">
+                <i data-lucide="users"></i>
+                <span>Customers</span>
+            </span>
+        </a>
+        
+        <a href="#" class="sidebar-menu-item" data-page="categories" title="Categories">
+            <i data-lucide="folder"></i>
+            <span class="sidebar-text">Categories</span>
+            <span class="tooltip">
+                <i data-lucide="folder"></i>
+                <span>Categories</span>
+            </span>
+        </a>
+        
+        <a href="#" class="sidebar-menu-item" data-page="inventory" title="Inventory">
+            <i data-lucide="warehouse"></i>
+            <span class="sidebar-text">Inventory</span>
+            <span class="tooltip">
+                <i data-lucide="warehouse"></i>
+                <span>Inventory</span>
+            </span>
+        </a>
+        
+        <a href="#" class="sidebar-menu-item" data-page="reports" title="Reports">
+            <i data-lucide="bar-chart-3"></i>
+            <span class="sidebar-text">Reports</span>
+            <span class="tooltip">
+                <i data-lucide="bar-chart-3"></i>
+                <span>Reports</span>
+            </span>
+        </a>
+        
+        <a href="#" class="sidebar-menu-item" data-page="settings" title="Settings">
+            <i data-lucide="settings"></i>
+            <span class="sidebar-text">Settings</span>
+            <span class="tooltip">
+                <i data-lucide="settings"></i>
+                <span>Settings</span>
+            </span>
+        </a>
+    </nav>
+
+    <!-- Sidebar Footer -->
+    <div class="sidebar-footer">
+        <div class="profile-dropdown">
+            <button class="sidebar-menu-item w-full" title="Admin User">
+                <div class="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden flex-shrink-0">
+                    <i data-lucide="user" class="h-4 w-4 text-gray-500"></i>
+                </div>
+                <div class="sidebar-text flex flex-col text-left min-w-0 flex-1">
+                    <span class="text-sm font-medium text-gray-900 truncate">Admin User</span>
+                    <span class="text-xs text-gray-500 truncate">Administrator</span>
+                </div>
+                <span class="tooltip">
+                    <i data-lucide="user"></i>
+                    <span>Admin User</span>
+                </span>
+            </button>
+            
+            <!-- Profile Dropdown -->
+            <div class="dropdown-content">
+                <div class="py-1">
+                    <a href="#" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-primary/10 hover:text-primary font-lexend">
+                        <i data-lucide="user" class="h-4 w-4 mr-2"></i>
+                        Profile Settings
+                    </a>
+                    <a href="#" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-primary/10 hover:text-primary font-lexend">
+                        <i data-lucide="log-out" class="h-4 w-4 mr-2"></i>
+                        Sign out
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</aside>
+
+<!-- Mobile Bottom Navigation -->
+<nav class="mobile-bottom-nav">
+    <div class="mobile-nav-container">
+        <a href="#" class="mobile-nav-item active" data-page="dashboard">
+            <i data-lucide="layout-dashboard"></i>
+            <span>Dashboard</span>
+        </a>
+        <a href="#" class="mobile-nav-item" data-page="products">
+            <i data-lucide="package"></i>
+            <span>Products</span>
+        </a>
+        <a href="#" class="mobile-nav-item" data-page="orders">
+            <i data-lucide="shopping-cart"></i>
+            <span>Orders</span>
+        </a>
+        <a href="#" class="mobile-nav-item" data-page="customers">
+            <i data-lucide="users"></i>
+            <span>Customers</span>
+        </a>
+        <a href="#" class="mobile-nav-item" data-page="settings">
+            <i data-lucide="settings"></i>
+            <span>Settings</span>
+        </a>
+    </div>
+</nav>
+
+<!-- Sidebar JavaScript -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize Lucide icons
+    if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+    }
+
+    // Sidebar collapse functionality
+    const sidebar = document.getElementById('sidebar');
+    const collapseBtn = document.getElementById('sidebar-collapse-btn');
+
+    if (collapseBtn && sidebar) {
+        collapseBtn.addEventListener('click', () => {
+            const currentState = sidebar.getAttribute('data-state');
+            if (currentState === 'expanded') {
+                sidebar.setAttribute('data-state', 'collapsed');
+            } else {
+                sidebar.setAttribute('data-state', 'expanded');
+            }
+            
+            // Reinitialize icons after state change
+            setTimeout(() => {
+                if (typeof lucide !== 'undefined') {
+                    lucide.createIcons();
+                }
+            }, 100);
+        });
+    }
+
+    // Active menu item functionality for both desktop and mobile
+    const allMenuItems = document.querySelectorAll('.sidebar-menu-item, .mobile-nav-item');
+    allMenuItems.forEach(item => {
+        item.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            const page = this.getAttribute('data-page');
+            
+            // Update desktop sidebar
+            document.querySelectorAll('.sidebar-menu-item').forEach(i => i.classList.remove('active'));
+            document.querySelectorAll('.mobile-nav-item').forEach(i => i.classList.remove('active'));
+            
+            // Add active to clicked items with same data-page
+            document.querySelectorAll(`[data-page="${page}"]`).forEach(i => i.classList.add('active'));
+        });
+
+        // Position tooltip on hover (desktop only)
+        if (item.classList.contains('sidebar-menu-item')) {
+            item.addEventListener('mouseenter', function() {
+                const tooltip = this.querySelector('.tooltip');
+                if (tooltip && sidebar && sidebar.getAttribute('data-state') === 'collapsed') {
+                    const rect = this.getBoundingClientRect();
+                    tooltip.style.top = rect.top + (rect.height / 2) + 'px';
+                    tooltip.style.left = (rect.right + 12) + 'px';
+                    tooltip.style.transform = 'translateY(-50%)';
+                    
+                    // Reinitialize icons in tooltip
+                    if (typeof lucide !== 'undefined') {
+                        lucide.createIcons();
+                    }
+                }
+            });
+        }
+    });
+});
+</script>
